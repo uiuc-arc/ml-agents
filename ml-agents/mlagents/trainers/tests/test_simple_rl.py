@@ -153,7 +153,6 @@ def _check_environment_trains(
             assert all(not math.isnan(reward) for reward in processed_rewards)
             for reward in processed_rewards: 
                 assert reward > success_threshold
-            #assert all(reward > success_threshold for reward in processed_rewards)
 
 
 @pytest.mark.parametrize("use_discrete", [True, False])
