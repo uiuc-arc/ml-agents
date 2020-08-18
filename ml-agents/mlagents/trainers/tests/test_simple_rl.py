@@ -142,7 +142,6 @@ def _check_environment_trains(
             train=True,
             training_seed=seed,
         )
-
         # Begin training
         tc.start_learning(env_manager)
         if (
@@ -152,7 +151,9 @@ def _check_environment_trains(
                 reward_processor(rewards) for rewards in env.final_rewards.values()
             ]
             assert all(not math.isnan(reward) for reward in processed_rewards)
-            assert all(reward > success_threshold for reward in processed_rewards)
+            for reward in processed_rewards: 
+                assert reward > success_threshold
+            #assert all(reward > success_threshold for reward in processed_rewards)
 
 
 @pytest.mark.parametrize("use_discrete", [True, False])
