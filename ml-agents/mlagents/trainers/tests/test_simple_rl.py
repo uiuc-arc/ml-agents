@@ -224,13 +224,13 @@ def test_recurrent_ppo(use_discrete):
         memory=NetworkSettings.MemorySettings(memory_size=16),
     )
     new_hyperparams = attr.evolve(
-        PPO_CONFIG.hyperparameters,  learning_rate=1e-3, batch_size=64, buffer_size=128 #learning_rate=0.08166178827568872,
+        PPO_CONFIG.hyperparameters,  batch_size=64, buffer_size=128 ,learning_rate=0.08166178827568872, #learning_rate=1e-3, 
     )
     config = attr.evolve(
         PPO_CONFIG,
         hyperparameters=new_hyperparams,
         network_settings=new_network_settings,
-        max_steps=5000, #1200,
+        max_steps=1200,
     )
     _check_environment_trains(env, {BRAIN_NAME: config}, success_threshold=0.9)
 
