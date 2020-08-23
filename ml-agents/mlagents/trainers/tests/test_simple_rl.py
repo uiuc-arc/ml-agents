@@ -158,7 +158,8 @@ def _check_environment_trains(
 @pytest.mark.parametrize("use_discrete", [True, False])
 def test_simple_ppo(use_discrete):
     env = SimpleEnvironment([BRAIN_NAME], use_discrete=use_discrete)
-    config = attr.evolve(PPO_CONFIG)
+    new_hyperparams=attr.evolve(PPO_CONFIG.hyperparameters, learning_rate=0.33745537315420393,  batch_size=16)
+    config = attr.evolve(PPO_CONFIG, hyperparameters=new_hyperparams,  max_steps=200 )
     _check_environment_trains(env, {BRAIN_NAME: config})
 
 
@@ -168,9 +169,9 @@ def test_2d_ppo(use_discrete):
         [BRAIN_NAME], use_discrete=use_discrete, action_size=2, step_size=0.8
     )
     new_hyperparams = attr.evolve(
-        PPO_CONFIG.hyperparameters, batch_size=64, buffer_size=640
+        PPO_CONFIG.hyperparameters, batch_size=256, buffer_size=640 ,learning_rate=0.6638906903255332
     )
-    config = attr.evolve(PPO_CONFIG, hyperparameters=new_hyperparams, max_steps=10000)
+    config = attr.evolve(PPO_CONFIG, hyperparameters=new_hyperparams, max_steps=700)
     _check_environment_trains(env, {BRAIN_NAME: config})
 
 
@@ -184,8 +185,8 @@ def test_visual_ppo(num_visual, use_discrete):
         num_vector=0,
         step_size=0.2,
     )
-    new_hyperparams = attr.evolve(PPO_CONFIG.hyperparameters, learning_rate=3.0e-4)
-    config = attr.evolve(PPO_CONFIG, hyperparameters=new_hyperparams)
+    new_hyperparams = attr.evolve(PPO_CONFIG.hyperparameters, learning_rate=0.0003314611102736501,  batch_size=16)
+    config = attr.evolve(PPO_CONFIG, hyperparameters=new_hyperparams, max_steps=300)
     _check_environment_trains(env, {BRAIN_NAME: config})
 
 
@@ -203,13 +204,13 @@ def test_visual_advanced_ppo(vis_encode_type, num_visual):
     new_networksettings = attr.evolve(
         SAC_CONFIG.network_settings, vis_encode_type=EncoderType(vis_encode_type)
     )
-    new_hyperparams = attr.evolve(PPO_CONFIG.hyperparameters, learning_rate=3.0e-4)
+    new_hyperparams = attr.evolve(PPO_CONFIG.hyperparameters, learning_rate=0.0013156248048980788, batch_size=32)
     config = attr.evolve(
         PPO_CONFIG,
         hyperparameters=new_hyperparams,
         network_settings=new_networksettings,
-        max_steps=500,
-        summary_freq=100,
+        max_steps=120,
+        summary_freq=100
     )
     # The number of steps is pretty small for these encoders
     _check_environment_trains(env, {BRAIN_NAME: config}, success_threshold=0.5)
@@ -223,13 +224,13 @@ def test_recurrent_ppo(use_discrete):
         memory=NetworkSettings.MemorySettings(memory_size=16),
     )
     new_hyperparams = attr.evolve(
-        PPO_CONFIG.hyperparameters, learning_rate=1.0e-3, batch_size=64, buffer_size=128
+        PPO_CONFIG.hyperparameters,  learning_rate=1e-3, batch_size=64, buffer_size=128 #learning_rate=0.08166178827568872,
     )
     config = attr.evolve(
         PPO_CONFIG,
         hyperparameters=new_hyperparams,
         network_settings=new_network_settings,
-        max_steps=5000,
+        max_steps=5000, #1200,
     )
     _check_environment_trains(env, {BRAIN_NAME: config}, success_threshold=0.9)
 
@@ -237,7 +238,10 @@ def test_recurrent_ppo(use_discrete):
 @pytest.mark.parametrize("use_discrete", [True, False])
 def test_simple_sac(use_discrete):
     env = SimpleEnvironment([BRAIN_NAME], use_discrete=use_discrete)
-    config = attr.evolve(SAC_CONFIG)
+    new_hyperparams = attr.evolve(
+        SAC_CONFIG.hyperparameters#, learning_rate=0.12678362315581493,  batch_size=16
+    )
+    config = attr.evolve(SAC_CONFIG)#,  hyperparameters = new_hyperparams, max_steps=360)
     _check_environment_trains(env, {BRAIN_NAME: config})
 
 
@@ -246,8 +250,8 @@ def test_2d_sac(use_discrete):
     env = SimpleEnvironment(
         [BRAIN_NAME], use_discrete=use_discrete, action_size=2, step_size=0.8
     )
-    new_hyperparams = attr.evolve(SAC_CONFIG.hyperparameters, buffer_init_steps=2000)
-    config = attr.evolve(SAC_CONFIG, hyperparameters=new_hyperparams, max_steps=10000)
+    new_hyperparams = attr.evolve(SAC_CONFIG.hyperparameters, buffer_init_steps=2000, learning_rate=0.022704133263474896, batch_size=4)
+    config = attr.evolve(SAC_CONFIG, hyperparameters=new_hyperparams, max_steps=2300)
     _check_environment_trains(env, {BRAIN_NAME: config}, success_threshold=0.8)
 
 
@@ -262,9 +266,9 @@ def test_visual_sac(num_visual, use_discrete):
         step_size=0.2,
     )
     new_hyperparams = attr.evolve(
-        SAC_CONFIG.hyperparameters, batch_size=16, learning_rate=3e-4
+        SAC_CONFIG.hyperparameters, batch_size=16, learning_rate=0.004011029990551147
     )
-    config = attr.evolve(SAC_CONFIG, hyperparameters=new_hyperparams)
+    config = attr.evolve(SAC_CONFIG, hyperparameters=new_hyperparams, max_steps=440)
     _check_environment_trains(env, {BRAIN_NAME: config})
 
 
@@ -284,15 +288,15 @@ def test_visual_advanced_sac(vis_encode_type, num_visual):
     )
     new_hyperparams = attr.evolve(
         SAC_CONFIG.hyperparameters,
-        batch_size=16,
-        learning_rate=3e-4,
+        batch_size=2,
+        learning_rate=0.00021481782012863283,
         buffer_init_steps=0,
     )
     config = attr.evolve(
         SAC_CONFIG,
         hyperparameters=new_hyperparams,
         network_settings=new_networksettings,
-        max_steps=100,
+        max_steps=30,
     )
     # The number of steps is pretty small for these encoders
     _check_environment_trains(env, {BRAIN_NAME: config}, success_threshold=0.5)
@@ -310,8 +314,8 @@ def test_recurrent_sac(use_discrete):
     )
     new_hyperparams = attr.evolve(
         SAC_CONFIG.hyperparameters,
-        batch_size=128,
-        learning_rate=1e-3,
+        batch_size=16,
+        learning_rate=0.0006963245937403463,
         buffer_init_steps=1000,
         steps_per_update=2,
     )
@@ -319,7 +323,7 @@ def test_recurrent_sac(use_discrete):
         SAC_CONFIG,
         hyperparameters=new_hyperparams,
         network_settings=new_networksettings,
-        max_steps=5000,
+        max_steps=3400
     )
     _check_environment_trains(env, {BRAIN_NAME: config})
 
@@ -465,13 +469,13 @@ def test_gail_visual_ppo(simple_record, use_discrete):
     reward_signals = {
         RewardSignalType.GAIL: GAILSettings(encoding_size=32, demo_path=demo_path)
     }
-    hyperparams = attr.evolve(PPO_CONFIG.hyperparameters, learning_rate=3e-4)
+    hyperparams = attr.evolve(PPO_CONFIG.hyperparameters, learning_rate=0.005393560704318981, batch_size=128)
     config = attr.evolve(
         PPO_CONFIG,
         reward_signals=reward_signals,
         hyperparameters=hyperparams,
         behavioral_cloning=bc_settings,
-        max_steps=1000,
+        max_steps=160
     )
     _check_environment_trains(env, {BRAIN_NAME: config}, success_threshold=0.9)
 
@@ -491,13 +495,13 @@ def test_gail_visual_sac(simple_record, use_discrete):
         RewardSignalType.GAIL: GAILSettings(encoding_size=32, demo_path=demo_path)
     }
     hyperparams = attr.evolve(
-        SAC_CONFIG.hyperparameters, learning_rate=3e-4, batch_size=16
+        SAC_CONFIG.hyperparameters, learning_rate=0.03400625961778856, batch_size=32
     )
     config = attr.evolve(
         SAC_CONFIG,
         reward_signals=reward_signals,
         hyperparameters=hyperparams,
         behavioral_cloning=bc_settings,
-        max_steps=500,
+        max_steps=160,
     )
     _check_environment_trains(env, {BRAIN_NAME: config}, success_threshold=0.9)
